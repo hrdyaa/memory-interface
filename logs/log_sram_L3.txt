@@ -1,4 +1,4 @@
-=== tb_sram_model  (READ_LATENCY=1, DEPTH=64, ADDR_W=12) ===
+=== tb_sram_model  (READ_LATENCY=3, DEPTH=64, ADDR_W=12) ===
 TEST 1: reset behaviour
   [PASS] T1a outputs idle during reset (ready=0,rvalid=0,rdata=0,err=0)
   [PASS] T1b ready stays low and no response for request made during reset
@@ -75,20 +75,20 @@ TEST 8: invalid addresses
   [PASS] T8e read highest address -> err
   [PASS] T8f misaligned in-range address reads containing word, no err
 TEST 9: response timing and acceptance
-  [PASS] T9a read latency = 1 cycle(s) (measured 1)
+  [PASS] T9a read latency = 3 cycle(s) (measured 3)
   [PASS] T9b rvalid is a single-cycle pulse
   [PASS] T9c no response while idle, ready=1
   [PASS] T9d exactly one response per accepted request
 TEST 10: reset during and between transactions
   [PASS] T10a write before reset
   [PASS] T10b memory contents survive reset
-  [PASS] T10c LAT=1: response already visible at reset edge is delivered
+  [PASS]         
   [PASS] T10d write accepted before reset retained (word 44)
   [PASS] T10e write accepted before reset retained (word 47)
   [PASS] T10f write presented during reset ignored
   [PASS] T10g scoreboard clean through all reset scenarios (0 mismatches)
-  [PASS] SCOREBOARD: 270 cycles compared, 0 mismatches
+  [PASS] SCOREBOARD: 410 cycles compared, 0 mismatches
 ---------------------------------------------------------------
   Directed checks: 79 passed, 0 failed
-  REGRESSION RESULT: PASS  (tb_sram_model, LAT=1)
-tb_sram_model.sv:309: $finish called at 2720000 (1ps)
+  REGRESSION RESULT: PASS  (tb_sram_model, LAT=3)
+tb/tb_sram_model.sv:309: $finish called at 4120000 (1ps)

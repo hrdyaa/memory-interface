@@ -130,4 +130,4 @@ TEST 14: deadlock detection + random regression (every transfer bounded by timeo
 ---------------------------------------------------------------
   Checks: 114 passed, 0 failed
   REGRESSION RESULT: PASS  (tb_spi_master)
-tb_spi_master.sv:413: $finish called at 65940000 (1ps)
+tb/tb_spi_master.sv:413: $finish called at 65940000 (1ps)
