@@ -1,0 +1,133 @@
+=== tb_spi_master (DATA_W=32, CLK_DIV_W=16, Tclk=10 ns) ===
+TEST 1: reset and idle output states
+  [PASS] T1a all outputs idle during reset (cs_n=1,sclk=0,mosi=0,busy=0,done=0,err=0,rx=0)
+  [PASS] T1b idle after reset release, no spontaneous activity
+  [PASS] T1c SCLK idle level follows CPOL=1 while idle
+  [PASS] T1d SCLK idle level back to 0 for CPOL=0
+TEST 2: known TX byte MSB-first (upper tx_data bits are garbage)
+  [PASS] T2 TX 0x9C MSB-first, mode 0, div 2
+TEST 3: known RX byte
+  [PASS] T3 RX 0x6B, mode 0, div 2
+TEST 4: simultaneous full duplex
+  [PASS] T4 full duplex 16 bit mode 0
+  [PASS] T4 full duplex 16 bit mode 1
+  [PASS] T4 full duplex 16 bit mode 2
+  [PASS] T4 full duplex 16 bit mode 3
+TEST 5: SCLK frequency vs clk_div (f_sclk = f_clk/(2*clk_div))
+  [PASS] T5 clk_div=1 transfer
+  [PASS] T5 SCLK period = 20 ns (= 2*1*10)
+  [PASS] T5 clk_div=2 transfer
+  [PASS] T5 SCLK period = 40 ns (= 2*2*10)
+  [PASS] T5 clk_div=3 transfer
+  [PASS] T5 SCLK period = 60 ns (= 2*3*10)
+  [PASS] T5 clk_div=5 transfer
+  [PASS] T5 SCLK period = 100 ns (= 2*5*10)
+  [PASS] T5 clk_div=8 transfer
+  [PASS] T5 SCLK period = 160 ns (= 2*8*10)
+TEST 6: CPOL/CPHA modes 0..3
+  [PASS] T6 mode 0 len 8 div 1
+  [PASS] T6 mode 0 len 13 div 3
+  [PASS] T6 mode 1 len 8 div 1
+  [PASS] T6 mode 1 len 13 div 3
+  [PASS] T6 mode 2 len 8 div 1
+  [PASS] T6 mode 2 len 13 div 3
+  [PASS] T6 mode 3 len 8 div 1
+  [PASS] T6 mode 3 len 13 div 3
+TEST 7: chip select
+  [PASS] T7 transfer for CS checks
+  [PASS] T7a cs_n low for exactly (2N+1)*div cycles
+  [PASS] T7b cs_n deasserted after completion
+TEST 8: completion timing
+  [PASS] T8 len 11 div 3
+  [PASS] T8a done at A0 + (2N+1)*div*Tclk = 690 ns
+  [PASS] T8b busy high exactly during the transfer
+TEST 9: consecutive independent transfers
+  [PASS] T9a #1 mode 0 len 8
+  [PASS] T9b #2 mode 3 len 16
+  [PASS] T9c #3 mode 1 len 5
+  [PASS] T9d #4 mode 2 len 32
+  [PASS] T9e first of back-to-back completed
+  [PASS] T9e transfer A verified
+  [PASS] T9f second of back-to-back completed
+  [PASS] T9f transfer B (started in done cycle) verified
+  [PASS] T9g cs_n high exactly 1 clk between back-to-back transfers
+TEST 10: start asserted while busy
+  [PASS] T10a transfer in progress
+  [PASS] T10b err_busy pulsed once
+  [PASS] T10c original transfer still completes
+  [PASS] T10d original transfer unaffected (data,len,div,mode)
+  [PASS] T10e ignored start did not queue a new transfer
+TEST 11: reset during active transfer
+  [PASS] T11a transfer active before reset
+  [PASS] T11b asynchronous reset: cs_n=1,busy=0,done=0,sclk=0,mosi=0 immediately
+  [PASS] T11c transfer abandoned: truncated frame, rx cleared, no done pulse
+  [PASS] T11d idle after reset
+  [PASS] T11e new transfer after reset works (no extra reset needed afterwards)
+  [PASS] T11f repeated transfer works
+TEST 12: invalid transfer configuration
+  [PASS] T12 len=0 clk_div=2 rejected: err_cfg pulse, no CS, no busy, no done
+  [PASS] T12 len=33 clk_div=2 rejected: err_cfg pulse, no CS, no busy, no done
+  [PASS] T12 len=63 clk_div=2 rejected: err_cfg pulse, no CS, no busy, no done
+  [PASS] T12 len=8 clk_div=0 rejected: err_cfg pulse, no CS, no busy, no done
+  [PASS] T12 len=0 clk_div=0 rejected: err_cfg pulse, no CS, no busy, no done
+  [PASS] T12f valid transfer after rejected starts
+TEST 13: minimum (1 bit) and maximum (32 bit) length
+  [PASS] T13 mode 0 len 1 tx=1 rx=0
+  [PASS] T13 mode 0 len 1 tx=0 rx=1
+  [PASS] T13 mode 0 len 32
+  [PASS] T13 mode 1 len 1 tx=1 rx=0
+  [PASS] T13 mode 1 len 1 tx=0 rx=1
+  [PASS] T13 mode 1 len 32
+  [PASS] T13 mode 2 len 1 tx=1 rx=0
+  [PASS] T13 mode 2 len 1 tx=0 rx=1
+  [PASS] T13 mode 2 len 32
+  [PASS] T13 mode 3 len 1 tx=1 rx=0
+  [PASS] T13 mode 3 len 1 tx=0 rx=1
+  [PASS] T13 mode 3 len 32
+TEST 14: deadlock detection + random regression (every transfer bounded by timeout)
+  [PASS] T14.0 mode 2 len 24 div 4
+  [PASS] T14.1 mode 1 len 15 div 3
+  [PASS] T14.2 mode 2 len 6 div 2
+  [PASS] T14.3 mode 3 len 29 div 2
+  [PASS] T14.4 mode 1 len 17 div 1
+  [PASS] T14.5 mode 0 len 25 div 2
+  [PASS] T14.6 mode 2 len 22 div 3
+  [PASS] T14.7 mode 0 len 22 div 2
+  [PASS] T14.8 mode 1 len 19 div 1
+  [PASS] T14.9 mode 0 len 10 div 3
+  [PASS] T14.10 mode 3 len 21 div 4
+  [PASS] T14.11 mode 3 len 12 div 1
+  [PASS] T14.12 mode 3 len 26 div 1
+  [PASS] T14.13 mode 3 len 18 div 2
+  [PASS] T14.14 mode 1 len 30 div 1
+  [PASS] T14.15 mode 1 len 25 div 1
+  [PASS] T14.16 mode 2 len 17 div 3
+  [PASS] T14.17 mode 2 len 23 div 4
+  [PASS] T14.18 mode 1 len 4 div 3
+  [PASS] T14.19 mode 0 len 12 div 1
+  [PASS] T14.20 mode 1 len 20 div 2
+  [PASS] T14.21 mode 2 len 26 div 4
+  [PASS] T14.22 mode 2 len 27 div 4
+  [PASS] T14.23 mode 0 len 11 div 3
+  [PASS] T14.24 mode 3 len 4 div 3
+  [PASS] T14.25 mode 2 len 20 div 2
+  [PASS] T14.26 mode 1 len 4 div 4
+  [PASS] T14.27 mode 0 len 24 div 4
+  [PASS] T14.28 mode 2 len 26 div 4
+  [PASS] T14.29 mode 3 len 19 div 4
+  [PASS] T14.30 mode 0 len 17 div 2
+  [PASS] T14.31 mode 0 len 17 div 3
+  [PASS] T14.32 mode 0 len 32 div 1
+  [PASS] T14.33 mode 3 len 15 div 4
+  [PASS] T14.34 mode 3 len 23 div 3
+  [PASS] T14.35 mode 3 len 14 div 2
+  [PASS] T14.36 mode 1 len 30 div 3
+  [PASS] T14.37 mode 2 len 2 div 3
+  [PASS] T14.38 mode 0 len 18 div 4
+  [PASS] T14.39 mode 3 len 25 div 4
+  [PASS] T14z core not stuck busy after regression
+  [PASS] done / err_cfg / err_busy were always exactly 1 clk wide
+---------------------------------------------------------------
+  Checks: 114 passed, 0 failed
+  REGRESSION RESULT: PASS  (tb_spi_master)
+tb_spi_master.sv:413: $finish called at 65940000 (1ps)

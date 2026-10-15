@@ -1,0 +1,94 @@
+=== tb_sram_model  (READ_LATENCY=3, DEPTH=64, ADDR_W=12) ===
+TEST 1: reset behaviour
+  [PASS] T1a outputs idle during reset (ready=0,rvalid=0,rdata=0,err=0)
+  [PASS] T1b ready stays low and no response for request made during reset
+  [PASS] T1c ready still low until first clock edge after release
+  [PASS] T1d ready=1 one cycle after reset release
+  [PASS] T1e request during reset was ignored; memory initialised to 0 (INIT_MODE 0)
+  [PASS] T1f last word initialised to 0
+TEST 2: single word write/read
+  [PASS] T2a write word 8
+  [PASS] T2b read back word 8
+TEST 3: multiple addresses
+  [PASS] T3 write word 0
+  [PASS] T3 write word 1
+  [PASS] T3 write word 2
+  [PASS] T3 write word 3
+  [PASS] T3 write word 4
+  [PASS] T3 write word 5
+  [PASS] T3 write word 6
+  [PASS] T3 write word 7
+  [PASS] T3 write word 8
+  [PASS] T3 write word 9
+  [PASS] T3 write word 10
+  [PASS] T3 write word 11
+  [PASS] T3 write word 12
+  [PASS] T3 write word 13
+  [PASS] T3 write word 14
+  [PASS] T3 write word 15
+  [PASS] T3 read word 0
+  [PASS] T3 read word 1
+  [PASS] T3 read word 2
+  [PASS] T3 read word 3
+  [PASS] T3 read word 4
+  [PASS] T3 read word 5
+  [PASS] T3 read word 6
+  [PASS] T3 read word 7
+  [PASS] T3 read word 8
+  [PASS] T3 read word 9
+  [PASS] T3 read word 10
+  [PASS] T3 read word 11
+  [PASS] T3 read word 12
+  [PASS] T3 read word 13
+  [PASS] T3 read word 14
+  [PASS] T3 read word 15
+TEST 4: byte enables
+  [PASS] T4a full word
+  [PASS] T4b be=0001
+  [PASS] T4b' only byte0 changed
+  [PASS] T4c be=0010
+  [PASS] T4c' only byte1 changed
+  [PASS] T4d be=1010
+  [PASS] T4d' bytes 3,1 changed
+  [PASS] T4e be=0000
+  [PASS] T4e' unchanged for be=0
+TEST 5: read after write (back-to-back)
+  [PASS] T5a two responses (write ack + read)
+  [PASS] T5b write ack rdata=0 err=0
+  [PASS] T5c read in the cycle after write sees new data
+TEST 6: consecutive requests
+  [PASS] T6a 8 back-to-back writes -> 8 acks
+  [PASS] T6b 8 back-to-back reads -> 8 in-order responses with correct data
+  [PASS] T6c W,R,W,R same address returns 1111_1111 then 2222_2222
+TEST 7: first and last valid locations
+  [PASS] T7a write first word
+  [PASS] T7b write last word
+  [PASS] T7c read first word
+  [PASS] T7d read last word
+  [PASS] T7e word before last untouched (no aliasing)
+  [PASS] T7f word after first untouched
+TEST 8: invalid addresses
+  [PASS] T8a read first invalid word -> err, ERR_RDATA
+  [PASS] T8b write first invalid word -> err
+  [PASS] T8c word 0 not corrupted (no address wrap-around)
+  [PASS] T8d last word not corrupted
+  [PASS] T8e read highest address -> err
+  [PASS] T8f misaligned in-range address reads containing word, no err
+TEST 9: response timing and acceptance
+  [PASS] T9a read latency = 3 cycle(s) (measured 3)
+  [PASS] T9b rvalid is a single-cycle pulse
+  [PASS] T9c no response while idle, ready=1
+  [PASS] T9d exactly one response per accepted request
+TEST 10: reset during and between transactions
+  [PASS] T10a write before reset
+  [PASS] T10b memory contents survive reset
+  [PASS]         
+  [PASS] T10d write accepted before reset retained (word 44)
+  [PASS] T10e write accepted before reset retained (word 47)
+  [PASS] T10f write presented during reset ignored
+  [PASS] T10g scoreboard clean through all reset scenarios (0 mismatches)
+  [PASS] SCOREBOARD: 410 cycles compared, 0 mismatches
+---------------------------------------------------------------
+  Directed checks: 79 passed, 0 failed
+  REGRESSION RESULT: PASS  (tb_sram_model, LAT=3)
+tb_sram_model.sv:309: $finish called at 4120000 (1ps)
